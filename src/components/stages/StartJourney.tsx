@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import type { ProjectDetails } from "@/data/packages";
-import { Home, ArrowRight } from "lucide-react";
+import { Home, ArrowRight, Plus, Minus } from "lucide-react";
 
 interface StartJourneyProps {
   onNext: (details: ProjectDetails) => void;
