@@ -1,6 +1,6 @@
-import { formatCurrency, getMetroMultiplier, budgetCategories, type Package, type ProjectDetails } from "@/data/packages";
+import { formatCurrency, getMetroMultiplier, budgetCategories, packages, type Package, type ProjectDetails } from "@/data/packages";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BudgetAllocationProps {
@@ -14,11 +14,9 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
   const multiplier = getMetroMultiplier(details.isMetro);
   const totalCost = Math.round(selectedPackage.pricePerSqft * details.bua * multiplier);
 
-  // Sanitary is per-toilet fixed, calculate its percentage
   const sanitaryTotal = selectedPackage.sanitaryPerToilet * details.bathrooms;
   const sanitaryPercent = Math.round((sanitaryTotal / totalCost) * 100);
 
-  // Build the allocations
   const allocations = budgetCategories.map((cat) => {
     if (cat.id === "sanitary") {
       return { ...cat, percentage: sanitaryPercent, amount: sanitaryTotal };
@@ -37,10 +35,22 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
     sage: "gradient-sage",
   };
 
-  const bgColorMap: Record<string, string> = {
-    primary: "bg-primary/10",
-    accent: "bg-accent/10",
-    sage: "bg-sage/10",
+  // Find next upgrade package
+  const currentIndex = packages.findIndex((p) => p.id === selectedPackage.id);
+  const nextPackage = currentIndex < packages.length - 1 ? packages[currentIndex + 1] : null;
+  const upgradeCost = nextPackage
+    ? Math.round(nextPackage.pricePerSqft * details.bua * multiplier) - totalCost
+    : 0;
+  const upgradeMonthly = nextPackage ? Math.round(upgradeCost / 12) : 0;
+
+  // Highlight descriptions per category
+  const categoryDescriptions: Record<string, { heading: string; sub: string }> = {
+    flooring: { heading: "Flooring & Finishes", sub: selectedPackage.highlights.flooring },
+    sanitary: { heading: "Sanitary Fittings", sub: `${formatCurrency(selectedPackage.sanitaryPerToilet)} × ${details.bathrooms} toilets` },
+    doors: { heading: "Doors & Windows", sub: `${selectedPackage.highlights.doors} • ${selectedPackage.highlights.windows}` },
+    electrical: { heading: "Electrical & Wiring", sub: selectedPackage.highlights.switches },
+    utilities: { heading: "Utilities & Infra", sub: "Plumbing, drainage, water tank & connections" },
+    construction: { heading: "Construction (CBS)", sub: `${selectedPackage.highlights.steel} • ${selectedPackage.highlights.cement}` },
   };
 
   return (
@@ -89,43 +99,50 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
         </div>
       </div>
 
-      {/* Category Cards */}
+      {/* Category Cards with headings & sub-headings */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {allocations.map((a, i) => (
-          <div
-            key={a.id}
-            className="glass-card p-5 space-y-3"
-            style={{ animationDelay: `${i * 0.08}s` }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{a.icon}</span>
-                <div>
-                  <h4 className="font-semibold text-foreground text-sm">{a.name}</h4>
-                  <p className="text-xs text-muted-foreground">{a.percentage}% of total</p>
+        {allocations.map((a, i) => {
+          const desc = categoryDescriptions[a.id];
+          return (
+            <div
+              key={a.id}
+              className="glass-card p-5 space-y-3"
+              style={{ animationDelay: `${i * 0.08}s` }}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl mt-0.5">{a.icon}</span>
+                  <div>
+                    <h4 className="font-semibold text-foreground text-sm">{desc?.heading || a.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">{desc?.sub}</p>
+                    <p className="text-[11px] text-primary/70 mt-1">{a.percentage}% of total budget</p>
+                  </div>
                 </div>
+                <span className="text-lg font-bold text-foreground whitespace-nowrap">{formatCurrency(a.amount)}</span>
               </div>
-              <span className="text-lg font-bold text-foreground">{formatCurrency(a.amount)}</span>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full animate-fill-bar", colorMap[a.color])}
+                  style={{ width: `${a.percentage}%`, animationDelay: `${i * 0.15}s` }}
+                />
+              </div>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div
-                className={cn("h-full rounded-full animate-fill-bar", colorMap[a.color])}
-                style={{ width: `${a.percentage}%`, animationDelay: `${i * 0.15}s` }}
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
+
+        {/* Misc & Contingency — Grey box */}
         {unallocatedPercent > 0 && (
-          <div className="glass-card p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📦</span>
+          <div className="p-5 space-y-3 rounded-2xl bg-muted/60 border border-border/50">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl mt-0.5">📦</span>
                 <div>
                   <h4 className="font-semibold text-foreground text-sm">Misc & Contingency</h4>
-                  <p className="text-xs text-muted-foreground">{unallocatedPercent}% buffer</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Buffer for unforeseen expenses, site clearing, approvals</p>
+                  <p className="text-[11px] text-muted-foreground/70 mt-1">{unallocatedPercent}% safety buffer</p>
                 </div>
               </div>
-              <span className="text-lg font-bold text-foreground">{formatCurrency(unallocatedAmount)}</span>
+              <span className="text-lg font-bold text-foreground whitespace-nowrap">{formatCurrency(unallocatedAmount)}</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div className="h-full rounded-full bg-muted-foreground/30 animate-fill-bar" style={{ width: `${unallocatedPercent}%` }} />
@@ -134,8 +151,40 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
         )}
       </div>
 
+      {/* Upgrade Upsell Card */}
+      {nextPackage && (
+        <div className="glass-card-static p-6 space-y-4 ring-1 ring-primary/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Upgrade to {nextPackage.name} ({nextPackage.nameHindi})</h3>
+              <p className="text-sm text-muted-foreground">{nextPackage.tagline}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 bg-primary/5 rounded-xl">
+              <p className="text-xs text-muted-foreground">Extra Cost</p>
+              <p className="text-lg font-bold text-primary">{formatCurrency(upgradeCost)}</p>
+            </div>
+            <div className="p-3 bg-primary/5 rounded-xl">
+              <p className="text-xs text-muted-foreground">Per Month</p>
+              <p className="text-lg font-bold text-primary">{formatCurrency(upgradeMonthly)}/mo</p>
+            </div>
+            <div className="p-3 bg-primary/5 rounded-xl">
+              <p className="text-xs text-muted-foreground">New Rate</p>
+              <p className="text-lg font-bold text-primary">{formatCurrency(nextPackage.pricePerSqft)}/sqft</p>
+            </div>
+          </div>
+          <p className="text-xs text-primary/80 text-center">
+            💡 For just <strong>{formatCurrency(upgradeMonthly)}/month</strong> more, get {nextPackage.highlights.flooring}, {nextPackage.highlights.switches} & more.
+          </p>
+        </div>
+      )}
+
       {/* Trust note */}
-      <div className={cn("p-4 rounded-xl text-sm text-center", bgColorMap["sage"])}>
+      <div className="p-4 rounded-xl text-sm text-center bg-sage/10">
         💡 Budget allocations are industry-standard benchmarks. Actual spending can be customized within each wallet.
       </div>
 
