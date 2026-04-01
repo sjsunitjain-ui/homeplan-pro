@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import type { ProjectDetails } from "@/data/packages";
-import { Home, ArrowRight } from "lucide-react";
+import { Home, ArrowRight, Plus, Minus } from "lucide-react";
 
 interface StartJourneyProps {
   onNext: (details: ProjectDetails) => void;
@@ -149,13 +149,35 @@ export default function StartJourney({ onNext }: StartJourneyProps) {
           <div className="space-y-3">
             <Label className="text-base">Bedrooms</Label>
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => update("bedrooms", Math.max(1, details.bedrooms - 1))}
+                className="w-10 h-10 rounded-xl bg-muted text-muted-foreground hover:bg-secondary flex items-center justify-center transition-all"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={details.bedrooms}
+                onChange={(e) => update("bedrooms", Math.max(1, Math.min(20, Number(e.target.value))))}
+                className="w-16 h-10 rounded-xl text-center font-semibold"
+              />
+              <button
+                onClick={() => update("bedrooms", Math.min(20, details.bedrooms + 1))}
+                className="w-10 h-10 rounded-xl bg-muted text-muted-foreground hover:bg-secondary flex items-center justify-center transition-all"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
               {[1, 2, 3, 4, 5].map((n) => (
                 <button
                   key={n}
                   onClick={() => update("bedrooms", n)}
-                  className={`w-12 h-12 rounded-xl font-semibold transition-all ${
+                  className={`w-10 h-8 rounded-lg text-sm font-medium transition-all ${
                     details.bedrooms === n
-                      ? "gradient-primary text-primary-foreground shadow-md scale-110"
+                      ? "gradient-primary text-primary-foreground shadow-md"
                       : "bg-muted text-muted-foreground hover:bg-secondary"
                   }`}
                 >
@@ -167,13 +189,35 @@ export default function StartJourney({ onNext }: StartJourneyProps) {
           <div className="space-y-3">
             <Label className="text-base">Bathrooms</Label>
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => update("bathrooms", Math.max(1, details.bathrooms - 1))}
+                className="w-10 h-10 rounded-xl bg-muted text-muted-foreground hover:bg-secondary flex items-center justify-center transition-all"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={details.bathrooms}
+                onChange={(e) => update("bathrooms", Math.max(1, Math.min(20, Number(e.target.value))))}
+                className="w-16 h-10 rounded-xl text-center font-semibold"
+              />
+              <button
+                onClick={() => update("bathrooms", Math.min(20, details.bathrooms + 1))}
+                className="w-10 h-10 rounded-xl bg-muted text-muted-foreground hover:bg-secondary flex items-center justify-center transition-all"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
               {[1, 2, 3, 4, 5].map((n) => (
                 <button
                   key={n}
                   onClick={() => update("bathrooms", n)}
-                  className={`w-12 h-12 rounded-xl font-semibold transition-all ${
+                  className={`w-10 h-8 rounded-lg text-sm font-medium transition-all ${
                     details.bathrooms === n
-                      ? "gradient-primary text-primary-foreground shadow-md scale-110"
+                      ? "gradient-primary text-primary-foreground shadow-md"
                       : "bg-muted text-muted-foreground hover:bg-secondary"
                   }`}
                 >

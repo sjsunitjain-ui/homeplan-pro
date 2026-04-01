@@ -26,12 +26,24 @@ export default function PackageSelection({ details, onSelect, onBack }: PackageS
         </p>
       </div>
 
-      {/* Mini Summary Card */}
-      <div className="glass-card-static p-4 flex flex-wrap items-center justify-center gap-6 text-sm">
-        <span className="flex items-center gap-2">🏠 <strong>{details.bua.toLocaleString()}</strong> sqft</span>
-        <span className="flex items-center gap-2">🛏️ <strong>{details.bedrooms}</strong> Bedrooms</span>
-        <span className="flex items-center gap-2">🚿 <strong>{details.bathrooms}</strong> Bathrooms</span>
-        <span className="flex items-center gap-2">📍 {details.city} ({details.isMetro ? "Metro" : "Non-Metro"})</span>
+      {/* Client Brief Summary */}
+      <div className="glass-card-static p-6 space-y-3">
+        <p className="text-foreground/90 text-sm leading-relaxed">
+          <strong>{details.name}</strong>, you're planning a beautiful <strong>{details.bedrooms}BHK</strong> home 
+          with <strong>{details.bathrooms} bathrooms</strong> in <strong>{details.city}</strong> ({details.isMetro ? "Metro" : "Non-Metro"}). 
+          Your built-up area of <strong>{details.bua.toLocaleString()} sqft</strong> gives you ample space 
+          to create the home of your dreams. Based on your specifications, here are the construction packages 
+          curated for you — each designed to match different lifestyle goals and budgets.
+        </p>
+        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1 border-t border-border/50">
+          <span className="flex items-center gap-1.5">🏠 {details.bua.toLocaleString()} sqft</span>
+          <span className="flex items-center gap-1.5">🛏️ {details.bedrooms} Bed</span>
+          <span className="flex items-center gap-1.5">🚿 {details.bathrooms} Bath</span>
+          <span className="flex items-center gap-1.5">📍 {details.city}</span>
+          {details.otherRequirements && (
+            <span className="flex items-center gap-1.5">📝 {details.otherRequirements}</span>
+          )}
+        </div>
       </div>
 
       {/* Package Grid */}

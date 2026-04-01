@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { formatCurrency, getMetroMultiplier, type Package, type ProjectDetails } from "@/data/packages";
+import { formatCurrency, getMetroMultiplier, budgetCategories, type Package, type ProjectDetails } from "@/data/packages";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, Shield, Clock } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 interface InvestmentSummaryProps {
   details: ProjectDetails;
@@ -29,6 +30,16 @@ function useCountUp(target: number, duration = 1500) {
   return value;
 }
 
+const PIE_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--accent))",
+  "hsl(142, 40%, 50%)",
+  "hsl(var(--primary) / 0.6)",
+  "hsl(var(--accent) / 0.6)",
+  "hsl(142, 40%, 50% / 0.6)",
+  "hsl(var(--muted-foreground) / 0.3)",
+];
+
 export default function InvestmentSummary({ details, selectedPackage, onNext, onBack }: InvestmentSummaryProps) {
   const multiplier = getMetroMultiplier(details.isMetro);
   const totalCost = Math.round(selectedPackage.pricePerSqft * details.bua * multiplier);
@@ -39,6 +50,21 @@ export default function InvestmentSummary({ details, selectedPackage, onNext, on
   const cost3Years = Math.round(totalCost * Math.pow(1 + inflationRate, 3));
   const savings1Year = cost1Year - totalCost;
   const savings3Years = cost3Years - totalCost;
+
+  // Pie chart data
+  const sanitaryTotal = selectedPackage.sanitaryPerToilet * details.bathrooms;
+  const sanitaryPercent = Math.round((sanitaryTotal / totalCost) * 100);
+  const fixedCategories = budgetCategories.map((cat) => {
+    if (cat.id === "sanitary") return { ...cat, percentage: sanitaryPercent };
+    return cat;
+  });
+  const allocatedPercent = fixedCategories.reduce((sum, c) => sum + c.percentage, 0);
+  const miscPercent = Math.max(0, 100 - allocatedPercent);
+
+  const pieData = [
+    ...fixedCategories.map((c) => ({ name: c.name, value: c.percentage })),
+    ...(miscPercent > 0 ? [{ name: "Misc & Contingency", value: miscPercent }] : []),
+  ];
 
   return (
     <div className="animate-slide-up max-w-3xl mx-auto space-y-8">
@@ -68,17 +94,51 @@ export default function InvestmentSummary({ details, selectedPackage, onNext, on
             </>
           )}
         </div>
+      </div>
 
-        {/* Visual cost bar */}
-        <div className="mt-6 space-y-2">
-          <div className="h-3 bg-muted rounded-full overflow-hidden">
-            <div className="h-full gradient-primary rounded-full animate-fill-bar" style={{ width: "100%" }} />
+      {/* Pie Chart */}
+      <div className="glass-card-static p-6 space-y-4">
+        <h3 className="font-semibold text-foreground text-center">Budget Distribution Overview</h3>
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <div className="w-56 h-56 mx-auto">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={90}
+                  paddingAngle={3}
+                  dataKey="value"
+                  strokeWidth={0}
+                >
+                  {pieData.map((_, index) => (
+                    <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number) => `${value}%`}
+                  contentStyle={{
+                    borderRadius: "12px",
+                    border: "none",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    fontSize: "13px",
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Construction</span>
-            <span>Finishes</span>
-            <span>Fittings</span>
-            <span>Infrastructure</span>
+          <div className="flex-1 grid grid-cols-2 gap-2 text-xs">
+            {pieData.map((entry, i) => (
+              <div key={entry.name} className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full shrink-0"
+                  style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}
+                />
+                <span className="text-foreground/80">{entry.name} ({entry.value}%)</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
