@@ -5,6 +5,7 @@ import PackageSelection from "@/components/stages/PackageSelection";
 import InvestmentSummary from "@/components/stages/InvestmentSummary";
 import BudgetAllocation from "@/components/stages/BudgetAllocation";
 import CompareDecide from "@/components/stages/CompareDecide";
+import PaymentMilestones from "@/components/stages/PaymentMilestones";
 import LoanEMI from "@/components/stages/LoanEMI";
 import FinalScreen from "@/components/stages/FinalScreen";
 import type { ProjectDetails, Package } from "@/data/packages";
@@ -13,6 +14,8 @@ export default function ConstructionWallet() {
   const [stage, setStage] = useState(1);
   const [details, setDetails] = useState<ProjectDetails | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+
+  const totalStages = 8;
 
   const goTo = (s: number) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -35,7 +38,7 @@ export default function ConstructionWallet() {
           </div>
           {stage > 1 && (
             <div className="text-xs text-muted-foreground">
-              Step {stage} of 7
+              Step {stage} of {totalStages}
             </div>
           )}
         </div>
@@ -93,7 +96,7 @@ export default function ConstructionWallet() {
         )}
 
         {stage === 6 && details && selectedPackage && (
-          <LoanEMI
+          <PaymentMilestones
             details={details}
             selectedPackage={selectedPackage}
             onNext={() => goTo(7)}
@@ -102,6 +105,15 @@ export default function ConstructionWallet() {
         )}
 
         {stage === 7 && details && selectedPackage && (
+          <LoanEMI
+            details={details}
+            selectedPackage={selectedPackage}
+            onNext={() => goTo(8)}
+            onBack={() => goTo(6)}
+          />
+        )}
+
+        {stage === 8 && details && selectedPackage && (
           <FinalScreen
             details={details}
             selectedPackage={selectedPackage}
