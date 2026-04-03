@@ -52,8 +52,9 @@
     --glass-bg: 260 30% 99% / 0.7;
     --glass-border: 260 20% 90% / 0.5;
     --shadow-soft: 0 8px 32px -8px hsl(262 40% 58% / 0.12);
-    --shadow-card: 0 4px 24px -4px hsl(262 40% 58% / 0.08);
-    --shadow-hover: 0 12px 40px -8px hsl(262 40% 58% / 0.18);
+    --shadow-card: 0 4px 24px -4px hsl(262 40% 58% / 0.10), 0 1.5px 6px -2px hsl(262 40% 58% / 0.06);
+    --shadow-hover: 0 16px 48px -8px hsl(262 40% 58% / 0.20), 0 4px 12px -2px hsl(262 40% 58% / 0.08);
+    --shadow-elevated: 0 20px 60px -12px hsl(262 40% 58% / 0.18), 0 6px 16px -4px hsl(262 40% 58% / 0.10);
     --gradient-primary: linear-gradient(135deg, hsl(262 40% 58%), hsl(280 45% 65%));
     --gradient-warm: linear-gradient(135deg, hsl(16 45% 65%), hsl(30 50% 70%));
     --gradient-sage: linear-gradient(135deg, hsl(150 20% 55%), hsl(160 25% 60%));
@@ -111,19 +112,25 @@
 
 @layer components {
   .glass-card {
-    @apply rounded-2xl border border-border/50 bg-card/70 backdrop-blur-xl;
+    @apply rounded-2xl border border-border/40 bg-card/80 backdrop-blur-xl;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
   }
 
   .glass-card:hover {
     box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    border-color: hsl(var(--primary) / 0.15);
   }
 
   .glass-card-static {
-    @apply rounded-2xl border border-border/50 bg-card/70 backdrop-blur-xl;
+    @apply rounded-2xl border border-border/40 bg-card/80 backdrop-blur-xl;
     box-shadow: var(--shadow-card);
+  }
+
+  .glass-card-elevated {
+    @apply rounded-2xl border border-border/30 bg-card/90 backdrop-blur-xl;
+    box-shadow: var(--shadow-elevated);
   }
 
   .gradient-primary {
