@@ -63,7 +63,7 @@ export default function InvestmentSummary({ details, selectedPackage, onNext, on
 
   const pieData = [
     ...fixedCategories.map((c) => ({ name: c.name, value: c.percentage })),
-    ...(miscPercent > 0 ? [{ name: "Misc & Contingency", value: miscPercent }] : []),
+    ...(miscPercent > 0 ? [{ name: "Grey Box Structure", value: miscPercent }] : []),
   ];
 
   return (

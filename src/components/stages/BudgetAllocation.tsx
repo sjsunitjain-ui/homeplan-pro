@@ -77,9 +77,9 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
           ))}
           {unallocatedPercent > 0 && (
             <div
-              className="h-full bg-muted-foreground/20"
+              className="h-full bg-muted-foreground/30"
               style={{ width: `${unallocatedPercent}%` }}
-              title={`Misc & Contingency: ${unallocatedPercent}%`}
+              title={`Grey Box Structure: ${unallocatedPercent}%`}
             />
           )}
         </div>
@@ -93,7 +93,7 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
           {unallocatedPercent > 0 && (
             <span className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
-              Misc & Contingency ({unallocatedPercent}%)
+              Grey Box Structure ({unallocatedPercent}%)
             </span>
           )}
         </div>
