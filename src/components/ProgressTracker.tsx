@@ -9,7 +9,7 @@ const stageToProgression = (stage: number): number => {
   if (stage <= 1) return 1;
   if (stage <= 2) return 2;
   if (stage <= 4) return 3;
-  if (stage <= 7) return 4;
+  if (stage <= 6) return 4;
   return 5;
 };
 
