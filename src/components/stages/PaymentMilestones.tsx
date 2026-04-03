@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { formatCurrency, getMetroMultiplier, type Package, type ProjectDetails } from "@/data/packages";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Circle, Milestone } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, ChevronRight, Milestone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PaymentMilestonesProps {
@@ -43,7 +44,6 @@ const milestones = [
   { sno: 27, name: "Completion of cleaning & handover", percentage: 5 },
 ];
 
-// Category groupings for visual sections
 const phases = [
   { label: "🏗️ Foundation & Structure", range: [0, 5] },
   { label: "🧱 Superstructure", range: [6, 9] },
@@ -54,18 +54,42 @@ const phases = [
 ];
 
 export default function PaymentMilestones({ details, selectedPackage, onNext, onBack }: PaymentMilestonesProps) {
+  const [expandedPhases, setExpandedPhases] = useState<string[]>([]);
   const totalCost = Math.round(selectedPackage.pricePerSqft * details.bua * getMetroMultiplier(details.isMetro));
 
   const computedMilestones = milestones.map((m) => {
-    if (m.isBooking) {
-      return { ...m, amount: BOOKING_AMOUNT };
-    }
+    if (m.isBooking) return { ...m, amount: BOOKING_AMOUNT };
     const rawAmount = Math.round(totalCost * (m.percentage / 100));
     const amount = m.deductBooking ? rawAmount - BOOKING_AMOUNT : rawAmount;
     return { ...m, amount };
   });
 
-  let runningTotal = 0;
+  const togglePhase = (label: string) => {
+    setExpandedPhases((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+    );
+  };
+
+  // Stage 0 and 1 are always visible individually
+  const stage0 = computedMilestones[0];
+  const stage1 = computedMilestones[1];
+
+  // Remaining phases start from phase index 1 (Superstructure) since Foundation includes 0&1
+  // We need to compute phase totals for collapsed view
+  const getPhaseTotal = (range: number[]) => {
+    return computedMilestones
+      .filter((m) => m.sno >= range[0] && m.sno <= range[1])
+      .reduce((sum, m) => sum + m.amount, 0);
+  };
+
+  const getPhasePercentage = (range: number[]) => {
+    return milestones
+      .filter((m) => m.sno >= range[0] && m.sno <= range[1])
+      .reduce((sum, m) => sum + m.percentage, 0);
+  };
+
+  // Cumulative up to stage 1
+  const cumulativeAfterStage1 = stage0.amount + stage1.amount;
 
   return (
     <div className="animate-slide-up max-w-3xl mx-auto space-y-8">
@@ -97,74 +121,116 @@ export default function PaymentMilestones({ details, selectedPackage, onNext, on
         </div>
       </div>
 
-      {/* Milestone Timeline */}
-      {phases.map((phase) => {
+      {/* Stage 0 — Booking */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wider px-1">
+          🏗️ Booking & Mobilisation
+        </h3>
+        <div className="glass-card-static p-4 flex items-start gap-3 ring-1 ring-primary/30 bg-primary/5">
+          <CheckCircle2 className="w-5 h-5 text-primary mt-1 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-xs text-muted-foreground">Stage 0</p>
+                <p className="text-sm font-medium text-foreground">{stage0.name}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-base font-bold text-foreground">{formatCurrency(stage0.amount)}</p>
+                <p className="text-[11px] text-muted-foreground">Fixed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stage 1 — Mobilisation */}
+        <div className="glass-card-static p-4 flex items-start gap-3">
+          <CheckCircle2 className="w-5 h-5 text-primary mt-1 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-xs text-muted-foreground">Stage 1</p>
+                <p className="text-sm font-medium text-foreground">{stage1.name}</p>
+                <p className="text-[11px] text-primary/70 mt-0.5">
+                  (10% of total = {formatCurrency(Math.round(totalCost * 0.1))} − ₹40,000 booking)
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-base font-bold text-foreground">{formatCurrency(stage1.amount)}</p>
+                <p className="text-[11px] text-muted-foreground">10%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Remaining Phases — Collapsed by default, show only headings */}
+      {phases.slice(1).map((phase) => {
+        const phaseTotal = getPhaseTotal(phase.range);
+        const phasePercent = getPhasePercentage(phase.range);
+        const isExpanded = expandedPhases.includes(phase.label);
+        const stageCount = phase.range[1] - phase.range[0] + 1;
         const phaseItems = computedMilestones.filter(
           (m) => m.sno >= phase.range[0] && m.sno <= phase.range[1]
         );
-        return (
-          <div key={phase.label} className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wider px-1">
-              {phase.label}
-            </h3>
-            <div className="space-y-2">
-              {phaseItems.map((m) => {
-                runningTotal += m.amount;
-                const cumulativePercent = Math.round((runningTotal / totalCost) * 100);
-                return (
-                  <div
-                    key={m.sno}
-                    className={cn(
-                      "glass-card-static p-4 flex items-start gap-3",
-                      m.isBooking && "ring-1 ring-primary/30 bg-primary/5"
-                    )}
-                  >
-                    {/* Timeline dot */}
-                    <div className="flex flex-col items-center mt-1 shrink-0">
-                      {m.isBooking ? (
-                        <CheckCircle2 className="w-5 h-5 text-primary" />
-                      ) : (
-                        <Circle className="w-5 h-5 text-muted-foreground/40" />
-                      )}
-                    </div>
 
-                    {/* Content */}
+        return (
+          <div key={phase.label} className="space-y-2">
+            <button
+              onClick={() => togglePhase(phase.label)}
+              className={cn(
+                "w-full glass-card-static p-4 flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 hover:shadow-md",
+                isExpanded && "ring-1 ring-primary/20"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                {isExpanded ? (
+                  <ChevronDown className="w-4 h-4 text-primary shrink-0" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                )}
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-foreground">{phase.label}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {stageCount} stages · {phasePercent}% of total
+                  </p>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-base font-bold text-foreground">{formatCurrency(phaseTotal)}</p>
+              </div>
+            </button>
+
+            {/* Expanded detail */}
+            {isExpanded && (
+              <div className="space-y-2 pl-4 border-l-2 border-primary/20 ml-4 animate-slide-up">
+                {phaseItems.map((m) => (
+                  <div key={m.sno} className="glass-card-static p-3 flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-xs text-muted-foreground">Stage {m.sno}</p>
-                          <p className="text-sm font-medium text-foreground leading-snug">{m.name}</p>
-                          {m.deductBooking && (
-                            <p className="text-[11px] text-primary/70 mt-0.5">
-                              ({m.percentage}% of total = {formatCurrency(Math.round(totalCost * (m.percentage / 100)))} − ₹40,000 booking)
-                            </p>
-                          )}
+                          <p className="text-[11px] text-muted-foreground">Stage {m.sno}</p>
+                          <p className="text-sm text-foreground leading-snug">{m.name}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-base font-bold text-foreground">{formatCurrency(m.amount)}</p>
-                          <p className="text-[11px] text-muted-foreground">
-                            {m.isBooking ? "Fixed" : `${m.percentage}%`}
-                          </p>
+                          <p className="text-sm font-semibold text-foreground">{formatCurrency(m.amount)}</p>
+                          <p className="text-[10px] text-muted-foreground">{m.percentage}%</p>
                         </div>
                       </div>
-                      {/* Progress bar */}
-                      <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full gradient-primary transition-all duration-700"
-                          style={{ width: `${Math.min(cumulativePercent, 100)}%` }}
-                        />
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mt-1 text-right">
-                        Cumulative: {formatCurrency(runningTotal)} ({cumulativePercent}%)
-                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
+
+      {/* Cumulative Summary */}
+      <div className="glass-card-static p-4 text-center">
+        <p className="text-xs text-muted-foreground">Total across all milestones</p>
+        <p className="text-xl font-bold text-foreground">{formatCurrency(totalCost)}</p>
+        <p className="text-[11px] text-muted-foreground mt-1">100% of project cost covered</p>
+      </div>
 
       {/* Trust Note */}
       <div className="p-4 rounded-xl text-sm text-center bg-sage/10">
