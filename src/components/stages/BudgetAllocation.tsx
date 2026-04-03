@@ -130,22 +130,22 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
           );
         })}
 
-        {/* Misc & Contingency — Grey box */}
+        {/* Grey Box Structure — Unallocated */}
         {unallocatedPercent > 0 && (
-          <div className="p-5 space-y-3 rounded-2xl bg-muted/60 border border-border/50">
+          <div className="p-5 space-y-3 rounded-2xl bg-muted border border-border">
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">📦</span>
+                <span className="text-2xl mt-0.5">🧱</span>
                 <div>
-                  <h4 className="font-semibold text-foreground text-sm">Misc & Contingency</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">Buffer for unforeseen expenses, site clearing, approvals</p>
-                  <p className="text-[11px] text-muted-foreground/70 mt-1">{unallocatedPercent}% safety buffer</p>
+                  <h4 className="font-semibold text-foreground text-sm">Grey Box Structure</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">Core structure, plastering, waterproofing, labour & overheads</p>
+                  <p className="text-[11px] text-muted-foreground/70 mt-1">{unallocatedPercent}% of total budget</p>
                 </div>
               </div>
               <span className="text-lg font-bold text-foreground whitespace-nowrap">{formatCurrency(unallocatedAmount)}</span>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div className="h-full rounded-full bg-muted-foreground/30 animate-fill-bar" style={{ width: `${unallocatedPercent}%` }} />
+            <div className="h-2 bg-background rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-muted-foreground/40 animate-fill-bar" style={{ width: `${unallocatedPercent}%` }} />
             </div>
           </div>
         )}
