@@ -94,7 +94,10 @@ export default function FinalScreen({ details, selectedPackage, onRestart }: Fin
           <Phone className="w-5 h-5" />
           Book Consultation
         </Button>
-        <Button variant="glass" size="lg" className="flex items-center gap-2">
+        <Button variant="glass" size="lg" className="flex items-center gap-2" onClick={() => {
+          generatePlanPDF(details, selectedPackage);
+          toast.success("PDF downloaded successfully!");
+        }}>
           <Download className="w-5 h-5" />
           Download Plan
         </Button>
