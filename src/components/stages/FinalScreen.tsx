@@ -1,6 +1,8 @@
 import { formatCurrency, getMetroMultiplier, type Package, type ProjectDetails } from "@/data/packages";
 import { Button } from "@/components/ui/button";
 import { Phone, Download, Share2, Sparkles, Shield, CheckCircle } from "lucide-react";
+import { generatePlanPDF } from "@/lib/generatePlanPDF";
+import { toast } from "sonner";
 
 interface FinalScreenProps {
   details: ProjectDetails;
