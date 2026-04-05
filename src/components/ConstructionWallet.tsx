@@ -8,18 +8,29 @@ import CompareDecide from "@/components/stages/CompareDecide";
 import PaymentMilestones from "@/components/stages/PaymentMilestones";
 import LoanEMI from "@/components/stages/LoanEMI";
 import FinalScreen from "@/components/stages/FinalScreen";
+import OfferPopup from "@/components/OfferPopup";
 import type { ProjectDetails, Package } from "@/data/packages";
 
 export default function ConstructionWallet() {
   const [stage, setStage] = useState(1);
   const [details, setDetails] = useState<ProjectDetails | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [showOffer, setShowOffer] = useState(false);
 
   const totalStages = 8;
 
   const goTo = (s: number) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setStage(s);
+    // Show offer popup when entering the Deciding stage (5)
+    if (s === 5) {
+      setTimeout(() => setShowOffer(true), 2000);
+    }
+  };
+
+  const handleBookNow = () => {
+    setShowOffer(false);
+    goTo(8); // Go to final screen
   };
 
   return (
@@ -101,6 +112,7 @@ export default function ConstructionWallet() {
             selectedPackage={selectedPackage}
             onNext={() => goTo(7)}
             onBack={() => goTo(5)}
+            onBookNow={handleBookNow}
           />
         )}
 
@@ -125,6 +137,13 @@ export default function ConstructionWallet() {
           />
         )}
       </main>
+
+      {/* Offer Popup */}
+      <OfferPopup
+        open={showOffer}
+        onClose={() => setShowOffer(false)}
+        onBookNow={handleBookNow}
+      />
     </div>
   );
 }
