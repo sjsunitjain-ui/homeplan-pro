@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { formatCurrency, getMetroMultiplier, type Package, type ProjectDetails } from "@/data/packages";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, ChevronDown, ChevronRight, Milestone } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowRight, CheckCircle2, Milestone, CreditCard } from "lucide-react";
 
 interface PaymentMilestonesProps {
   details: ProjectDetails;
   selectedPackage: Package;
   onNext: () => void;
   onBack: () => void;
+  onBookNow: () => void;
 }
 
 const BOOKING_AMOUNT = 40000;
@@ -53,8 +52,7 @@ const phases = [
   { label: "🎨 Final Finishing & Handover", range: [26, 27] },
 ];
 
-export default function PaymentMilestones({ details, selectedPackage, onNext, onBack }: PaymentMilestonesProps) {
-  const [expandedPhases, setExpandedPhases] = useState<string[]>([]);
+export default function PaymentMilestones({ details, selectedPackage, onNext, onBack, onBookNow }: PaymentMilestonesProps) {
   const totalCost = Math.round(selectedPackage.pricePerSqft * details.bua * getMetroMultiplier(details.isMetro));
 
   const computedMilestones = milestones.map((m) => {
@@ -64,18 +62,9 @@ export default function PaymentMilestones({ details, selectedPackage, onNext, on
     return { ...m, amount };
   });
 
-  const togglePhase = (label: string) => {
-    setExpandedPhases((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
-    );
-  };
-
-  // Stage 0 and 1 are always visible individually
   const stage0 = computedMilestones[0];
   const stage1 = computedMilestones[1];
 
-  // Remaining phases start from phase index 1 (Superstructure) since Foundation includes 0&1
-  // We need to compute phase totals for collapsed view
   const getPhaseTotal = (range: number[]) => {
     return computedMilestones
       .filter((m) => m.sno >= range[0] && m.sno <= range[1])
@@ -87,9 +76,6 @@ export default function PaymentMilestones({ details, selectedPackage, onNext, on
       .filter((m) => m.sno >= range[0] && m.sno <= range[1])
       .reduce((sum, m) => sum + m.percentage, 0);
   };
-
-  // Cumulative up to stage 1
-  const cumulativeAfterStage1 = stage0.amount + stage1.amount;
 
   return (
     <div className="animate-slide-up max-w-3xl mx-auto space-y-8">
@@ -163,64 +149,25 @@ export default function PaymentMilestones({ details, selectedPackage, onNext, on
         </div>
       </div>
 
-      {/* Remaining Phases — Collapsed by default, show only headings */}
+      {/* Remaining Phases — Heading only, no collapsible */}
       {phases.slice(1).map((phase) => {
         const phaseTotal = getPhaseTotal(phase.range);
         const phasePercent = getPhasePercentage(phase.range);
-        const isExpanded = expandedPhases.includes(phase.label);
         const stageCount = phase.range[1] - phase.range[0] + 1;
-        const phaseItems = computedMilestones.filter(
-          (m) => m.sno >= phase.range[0] && m.sno <= phase.range[1]
-        );
 
         return (
-          <div key={phase.label} className="space-y-2">
-            <button
-              onClick={() => togglePhase(phase.label)}
-              className={cn(
-                "w-full glass-card-static p-4 flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 hover:shadow-md",
-                isExpanded && "ring-1 ring-primary/20"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                {isExpanded ? (
-                  <ChevronDown className="w-4 h-4 text-primary shrink-0" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                )}
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-foreground">{phase.label}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {stageCount} stages · {phasePercent}% of total
-                  </p>
-                </div>
+          <div key={phase.label} className="glass-card-static p-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="text-left">
+                <p className="text-sm font-semibold text-foreground">{phase.label}</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {stageCount} stages · {phasePercent}% of total
+                </p>
               </div>
-              <div className="text-right shrink-0">
-                <p className="text-base font-bold text-foreground">{formatCurrency(phaseTotal)}</p>
-              </div>
-            </button>
-
-            {/* Expanded detail */}
-            {isExpanded && (
-              <div className="space-y-2 pl-4 border-l-2 border-primary/20 ml-4 animate-slide-up">
-                {phaseItems.map((m) => (
-                  <div key={m.sno} className="glass-card-static p-3 flex items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-[11px] text-muted-foreground">Stage {m.sno}</p>
-                          <p className="text-sm text-foreground leading-snug">{m.name}</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-sm font-semibold text-foreground">{formatCurrency(m.amount)}</p>
-                          <p className="text-[10px] text-muted-foreground">{m.percentage}%</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            </div>
+            <div className="text-right shrink-0">
+              <p className="text-base font-bold text-foreground">{formatCurrency(phaseTotal)}</p>
+            </div>
           </div>
         );
       })}
@@ -239,7 +186,10 @@ export default function PaymentMilestones({ details, selectedPackage, onNext, on
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Button variant="ghost" onClick={onBack}>← Back</Button>
-        <Button variant="hero" size="xl" onClick={onNext}>
+        <Button variant="hero" size="xl" onClick={onBookNow}>
+          <CreditCard className="w-5 h-5" /> Book Now — ₹40,000
+        </Button>
+        <Button variant="glass" size="lg" onClick={onNext}>
           Plan Your Loan EMI <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
