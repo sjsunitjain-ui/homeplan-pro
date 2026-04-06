@@ -2,7 +2,9 @@ import { formatCurrency, getMetroMultiplier, type Package, type ProjectDetails }
 import { Button } from "@/components/ui/button";
 import { Phone, Download, Share2, Sparkles, Shield, CheckCircle } from "lucide-react";
 import { generatePlanPDF } from "@/lib/generatePlanPDF";
+import { submitLead } from "@/lib/submitLead";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 interface FinalScreenProps {
   details: ProjectDetails;
@@ -13,6 +15,10 @@ interface FinalScreenProps {
 export default function FinalScreen({ details, selectedPackage, onRestart }: FinalScreenProps) {
   const totalCost = Math.round(selectedPackage.pricePerSqft * details.bua * getMetroMultiplier(details.isMetro));
   const confidenceScore = selectedPackage.recommended ? 92 : selectedPackage.id === "utkrisht" ? 95 : 85;
+
+  useEffect(() => {
+    submitLead(details, selectedPackage);
+  }, []);
 
   return (
     <div className="animate-slide-up max-w-3xl mx-auto space-y-8">
