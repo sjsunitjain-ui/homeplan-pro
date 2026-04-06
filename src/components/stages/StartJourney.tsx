@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import type { ProjectDetails } from "@/data/packages";
 import { Home, ArrowRight, Plus, Minus } from "lucide-react";
+import { submitLead } from "@/lib/submitLead";
 
 interface StartJourneyProps {
   onNext: (details: ProjectDetails) => void;
@@ -247,7 +248,10 @@ export default function StartJourney({ onNext }: StartJourneyProps) {
           variant="hero"
           size="xl"
           disabled={!isValid}
-          onClick={() => onNext(details)}
+          onClick={() => {
+            submitLead(details);
+            onNext(details);
+          }}
           className="w-full max-w-sm"
         >
           See Your Build Plan <ArrowRight className="w-5 h-5" />
