@@ -1,6 +1,7 @@
 import { formatCurrency, getMetroMultiplier, type Package, type ProjectDetails } from "@/data/packages";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Milestone, CreditCard } from "lucide-react";
+import { ArrowRight, CheckCircle2, Milestone, CreditCard, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PaymentMilestonesProps {
   details: ProjectDetails;
@@ -44,12 +45,21 @@ const milestones = [
 ];
 
 const phases = [
-  { label: "🏗️ Foundation & Structure", range: [0, 5] },
-  { label: "🧱 Superstructure", range: [6, 9] },
-  { label: "🔨 Finishing — External", range: [10, 12] },
-  { label: "⚡ Finishing — Internal", range: [13, 20] },
-  { label: "🚪 Fitments & Fixtures", range: [21, 25] },
-  { label: "🎨 Final Finishing & Handover", range: [26, 27] },
+  { label: "Foundation & Structure", icon: "🏗️", range: [0, 5] },
+  { label: "Superstructure", icon: "🧱", range: [6, 9] },
+  { label: "Finishing — External", icon: "🔨", range: [10, 12] },
+  { label: "Finishing — Internal", icon: "⚡", range: [13, 20] },
+  { label: "Fitments & Fixtures", icon: "🚪", range: [21, 25] },
+  { label: "Final Finishing & Handover", icon: "🎨", range: [26, 27] },
+];
+
+const phaseColors = [
+  "bg-primary/8 border-primary/15",
+  "bg-accent/8 border-accent/15",
+  "bg-sage/8 border-sage/15",
+  "bg-primary/6 border-primary/12",
+  "bg-accent/6 border-accent/12",
+  "bg-sage/6 border-sage/12",
 ];
 
 export default function PaymentMilestones({ details, selectedPackage, onNext, onBack, onBookNow }: PaymentMilestonesProps) {
@@ -78,118 +88,136 @@ export default function PaymentMilestones({ details, selectedPackage, onNext, on
   };
 
   return (
-    <div className="animate-slide-up max-w-3xl mx-auto space-y-8">
-      <div className="text-center space-y-3">
-        <div className="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-          <Milestone className="w-7 h-7 text-primary-foreground" />
+    <div className="animate-slide-up max-w-3xl mx-auto space-y-10">
+      <div className="text-center space-y-4">
+        <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto shadow-xl shimmer">
+          <Milestone className="w-8 h-8 text-primary-foreground" />
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold">
+        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1]">
           <span className="text-gradient">Payment</span> Milestones
         </h2>
         <p className="text-muted-foreground text-lg">
-          Stage-wise payment schedule for your {formatCurrency(totalCost)} project
+          Stage-wise payment schedule for your <strong className="text-foreground">{formatCurrency(totalCost)}</strong> project
         </p>
       </div>
 
       {/* Summary Card */}
-      <div className="glass-card-static p-6 grid grid-cols-3 gap-4 text-center">
-        <div>
-          <p className="text-xs text-muted-foreground">Total Project Cost</p>
-          <p className="text-xl font-bold text-foreground">{formatCurrency(totalCost)}</p>
+      <div className="glass-card-elevated p-6 grid grid-cols-3 gap-4 text-center">
+        <div className="stat-card">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Total Cost</p>
+          <p className="text-xl font-extrabold text-foreground mt-1">{formatCurrency(totalCost)}</p>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Booking Amount</p>
-          <p className="text-xl font-bold text-primary">{formatCurrency(BOOKING_AMOUNT)}</p>
+        <div className="stat-card bg-primary/5 border-primary/10">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Booking</p>
+          <p className="text-xl font-extrabold text-primary mt-1">{formatCurrency(BOOKING_AMOUNT)}</p>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Total Milestones</p>
-          <p className="text-xl font-bold text-foreground">{milestones.length}</p>
+        <div className="stat-card">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Milestones</p>
+          <p className="text-xl font-extrabold text-foreground mt-1">{milestones.length}</p>
         </div>
       </div>
 
-      {/* Stage 0 — Booking */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wider px-1">
+      {/* Stage 0 & 1 */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-primary/70 px-1">
           🏗️ Booking & Mobilisation
-        </h3>
-        <div className="glass-card-static p-4 flex items-start gap-3 ring-1 ring-primary/30 bg-primary/5">
-          <CheckCircle2 className="w-5 h-5 text-primary mt-1 shrink-0" />
+        </div>
+
+        <div className="glass-card-glow p-5 flex items-start gap-4 animate-fade-in-up">
+          <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shrink-0 shadow-lg">
+            <CheckCircle2 className="w-5 h-5 text-primary-foreground" />
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-xs text-muted-foreground">Stage 0</p>
-                <p className="text-sm font-medium text-foreground">{stage0.name}</p>
+                <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Stage 0</p>
+                <p className="text-sm font-semibold text-foreground mt-0.5">{stage0.name}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-base font-bold text-foreground">{formatCurrency(stage0.amount)}</p>
-                <p className="text-[11px] text-muted-foreground">Fixed</p>
+                <p className="text-lg font-extrabold text-foreground">{formatCurrency(stage0.amount)}</p>
+                <p className="text-[10px] text-primary font-semibold">Fixed</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stage 1 — Mobilisation */}
-        <div className="glass-card-static p-4 flex items-start gap-3">
-          <CheckCircle2 className="w-5 h-5 text-primary mt-1 shrink-0" />
+        <div className="glass-card-elevated p-5 flex items-start gap-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-xs text-muted-foreground">Stage 1</p>
-                <p className="text-sm font-medium text-foreground">{stage1.name}</p>
-                <p className="text-[11px] text-primary/70 mt-0.5">
+                <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Stage 1</p>
+                <p className="text-sm font-semibold text-foreground mt-0.5">{stage1.name}</p>
+                <p className="text-[11px] text-primary/60 mt-1 font-medium">
                   (10% of total = {formatCurrency(Math.round(totalCost * 0.1))} − ₹40,000 booking)
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-base font-bold text-foreground">{formatCurrency(stage1.amount)}</p>
-                <p className="text-[11px] text-muted-foreground">10%</p>
+                <p className="text-lg font-extrabold text-foreground">{formatCurrency(stage1.amount)}</p>
+                <p className="text-[10px] text-muted-foreground font-semibold">10%</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Remaining Phases — Heading only, no collapsible */}
-      {phases.slice(1).map((phase) => {
-        const phaseTotal = getPhaseTotal(phase.range);
-        const phasePercent = getPhasePercentage(phase.range);
-        const stageCount = phase.range[1] - phase.range[0] + 1;
+      {/* Remaining Phases */}
+      <div className="space-y-3">
+        {phases.slice(1).map((phase, i) => {
+          const phaseTotal = getPhaseTotal(phase.range);
+          const phasePercent = getPhasePercentage(phase.range);
+          const stageCount = phase.range[1] - phase.range[0] + 1;
 
-        return (
-          <div key={phase.label} className="glass-card-static p-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="text-left">
-                <p className="text-sm font-semibold text-foreground">{phase.label}</p>
-                <p className="text-[11px] text-muted-foreground">
-                  {stageCount} stages · {phasePercent}% of total
-                </p>
+          return (
+            <div
+              key={phase.label}
+              className={cn(
+                "rounded-2xl border p-5 flex items-center justify-between gap-4 transition-all hover:shadow-md animate-fade-in-up",
+                phaseColors[i % phaseColors.length]
+              )}
+              style={{
+                animationDelay: `${(i + 2) * 0.08}s`,
+                boxShadow: '0 2px 12px -4px hsl(262 40% 58% / 0.06), inset 0 1px 0 0 hsl(0 0% 100% / 0.06)',
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">{phase.icon}</div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">{phase.label}</p>
+                  <p className="text-[11px] text-muted-foreground font-medium">
+                    {stageCount} stages · {phasePercent}% of total
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <p className="text-lg font-extrabold text-foreground">{formatCurrency(phaseTotal)}</p>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
               </div>
             </div>
-            <div className="text-right shrink-0">
-              <p className="text-base font-bold text-foreground">{formatCurrency(phaseTotal)}</p>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Cumulative Summary */}
-      <div className="glass-card-static p-4 text-center">
-        <p className="text-xs text-muted-foreground">Total across all milestones</p>
-        <p className="text-xl font-bold text-foreground">{formatCurrency(totalCost)}</p>
-        <p className="text-[11px] text-muted-foreground mt-1">100% of project cost covered</p>
+          );
+        })}
       </div>
 
-      {/* Trust Note */}
-      <div className="p-4 rounded-xl text-sm text-center bg-sage/10">
+      {/* Cumulative Summary */}
+      <div className="glass-card-elevated p-5 text-center">
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Total across all milestones</p>
+        <p className="text-2xl font-extrabold text-foreground mt-1">{formatCurrency(totalCost)}</p>
+        <p className="text-[11px] text-muted-foreground mt-1 font-medium">100% of project cost covered</p>
+      </div>
+
+      {/* Trust */}
+      <div className="p-4 rounded-xl text-sm text-center bg-sage/8 border border-sage/15 text-muted-foreground">
         💡 Payments are linked to verified construction milestones — you pay only when work is completed and inspected.
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Button variant="ghost" onClick={onBack}>← Back</Button>
-        <Button variant="hero" size="xl" onClick={onBookNow}>
+        <Button variant="ghost" onClick={onBack} className="text-muted-foreground">← Back</Button>
+        <Button variant="hero" size="xl" onClick={onBookNow} className="shimmer font-semibold">
           <CreditCard className="w-5 h-5" /> Book Now — ₹40,000
         </Button>
-        <Button variant="glass" size="lg" onClick={onNext}>
+        <Button variant="glass" size="lg" onClick={onNext} className="font-semibold">
           Plan Your Loan EMI <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
