@@ -30,7 +30,7 @@ export default function FinalScreen({ details, selectedPackage, onRestart }: Fin
             <PartyPopper className="w-4 h-4 text-accent-foreground" />
           </div>
         </div>
-        <h2 className="text-3xl md:text-5xl font-extrabold text-foreground leading-[1.1]">
+        <h2 className="text-3xl md:text-5xl font-extrabold text-foreground leading-[1.1] hero-text-shadow">
           You're closer than<br />
           <span className="text-gradient">you think.</span>
         </h2>

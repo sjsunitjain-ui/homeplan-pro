@@ -26,7 +26,7 @@ export default function CompareDecide({ details, selectedPackage, onChangePackag
   return (
     <div className="animate-slide-up max-w-6xl mx-auto space-y-10">
       <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1]">
+        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1] hero-text-shadow">
           <span className="text-gradient">Compare & Decide</span>
         </h2>
         <p className="text-muted-foreground text-lg">

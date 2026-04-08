@@ -125,7 +125,7 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
   return (
     <div className="animate-slide-up max-w-3xl mx-auto space-y-10">
       <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1]">
+        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1] hero-text-shadow">
           <span className="text-gradient">Budget Allocation</span> Engine
         </h2>
         <p className="text-muted-foreground text-lg">
