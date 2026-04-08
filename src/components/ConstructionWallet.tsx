@@ -9,6 +9,7 @@ import PaymentMilestones from "@/components/stages/PaymentMilestones";
 import LoanEMI from "@/components/stages/LoanEMI";
 import FinalScreen from "@/components/stages/FinalScreen";
 import OfferPopup from "@/components/OfferPopup";
+import AIChatbot from "@/components/AIChatbot";
 import type { ProjectDetails, Package } from "@/data/packages";
 
 export default function ConstructionWallet() {
@@ -152,6 +153,9 @@ export default function ConstructionWallet() {
         onClose={() => setShowOffer(false)}
         onBookNow={handleBookNow}
       />
+
+      {/* AI Chatbot */}
+      <AIChatbot />
     </div>
   );
 }
