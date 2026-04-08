@@ -52,13 +52,21 @@ export default function ConstructionWallet() {
               <p className="text-[10px] text-muted-foreground -mt-0.5 font-medium tracking-wider uppercase">Construction Wallet</p>
             </div>
           </div>
-          {stage > 1 && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {stage > 1 && (
               <div className="text-xs font-medium text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full backdrop-blur-sm">
                 Step {stage} of {totalStages}
               </div>
-            </div>
-          )}
+            )}
+            <button
+              onClick={() => document.documentElement.classList.toggle('dark')}
+              className="w-9 h-9 rounded-xl bg-muted/60 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-muted transition-all duration-300 hover:shadow-md"
+              aria-label="Toggle dark mode"
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground" />
+            </button>
+          </div>
         </div>
         {stage > 1 && <ProgressTracker currentStage={stage} />}
         {/* Gradient line at bottom */}
