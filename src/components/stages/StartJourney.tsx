@@ -38,7 +38,7 @@ export default function StartJourney({ onNext }: StartJourneyProps) {
           <Home className="w-10 h-10 text-primary-foreground" />
         </div>
         <div className="space-y-3">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-foreground leading-[1.1]">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-foreground leading-[1.1] hero-text-shadow">
             Start Your <span className="text-gradient">Dream Home</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">

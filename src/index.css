@@ -254,6 +254,27 @@
     background: linear-gradient(90deg, transparent, hsl(var(--border) / 0.5), transparent);
   }
 
+  /* Text shadow effects */
+  .card-title-shadow {
+    text-shadow: 0 1px 2px hsl(var(--foreground) / 0.08), 0 0 8px hsl(262 40% 58% / 0.06);
+  }
+
+  .hero-text-shadow {
+    text-shadow: 0 2px 4px hsl(var(--foreground) / 0.1), 0 0 20px hsl(262 40% 58% / 0.08);
+  }
+
+  .card-shadow {
+    box-shadow: 0 4px 16px -4px hsl(262 40% 58% / 0.08), 0 1px 3px -1px hsl(262 40% 58% / 0.04);
+  }
+
+  .enhanced-card-shadow {
+    box-shadow: 0 8px 32px -6px hsl(262 40% 58% / 0.15), 0 2px 8px -2px hsl(262 40% 58% / 0.08), inset 0 1px 0 hsl(0 0% 100% / 0.08);
+  }
+
+  .stat-value-shadow {
+    text-shadow: 0 1px 3px hsl(262 40% 58% / 0.15);
+  }
+
   /* Animations */
   .animate-count-up {
     animation: countUp 1.5s ease-out forwards;

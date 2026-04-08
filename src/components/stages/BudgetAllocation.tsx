@@ -3,6 +3,7 @@ import { formatCurrency, getMetroMultiplier, budgetCategories, packages, calcula
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import SanitaryWallet from "@/components/SanitaryWallet";
 
 interface BudgetAllocationProps {
   details: ProjectDetails;
@@ -124,7 +125,7 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
   return (
     <div className="animate-slide-up max-w-3xl mx-auto space-y-10">
       <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1]">
+        <h2 className="text-3xl md:text-5xl font-extrabold leading-[1.1] hero-text-shadow">
           <span className="text-gradient">Budget Allocation</span> Engine
         </h2>
         <p className="text-muted-foreground text-lg">
@@ -350,6 +351,11 @@ export default function BudgetAllocation({ details, selectedPackage, onNext, onB
           </p>
         </div>
       )}
+
+      {/* Interactive Sanitary Wallet */}
+      <div className="glass-card-elevated p-6 md:p-8">
+        <SanitaryWallet bathrooms={details.bathrooms} baseBudget={sanitaryTotal} />
+      </div>
 
       {/* Trust */}
       <div className="p-4 rounded-xl text-sm text-center text-muted-foreground bg-sage/8 border border-sage/15">
