@@ -2,6 +2,7 @@ import { packages, formatCurrency, type Package, type ProjectDetails } from "@/d
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, X, Star, Sparkles, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import GoodToKnow from "@/components/GoodToKnow";
 
 interface CompareDecideProps {
   details: ProjectDetails;
@@ -158,6 +159,11 @@ export default function CompareDecide({ details, selectedPackage, onChangePackag
           </p>
         </div>
       )}
+
+      {/* Good to Know */}
+      <div className="glass-card-elevated p-6 md:p-8">
+        <GoodToKnow />
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Button variant="ghost" onClick={onBack} className="text-muted-foreground">← Back</Button>
