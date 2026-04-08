@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Sun, Moon } from "lucide-react";
 import ProgressTracker from "@/components/ProgressTracker";
 import StartJourney from "@/components/stages/StartJourney";
 import PackageSelection from "@/components/stages/PackageSelection";
